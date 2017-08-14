@@ -15,7 +15,7 @@ venta_periodicos <- function(compra_del_dia, dias_a_simular) {
   probabilidad_venta_bueno <- c(0.10, 0.18, 0.40, 0.20, 0.08, 0.10, 0)
   probabilidad_venta_malo <- c(0.44, 0.22, 0.16, 0.12, 0.06, 0, 0)
   
-  simulacion <- list()
+  simulacion <- data.frame()
   
   for (i in 1:dias_a_simular){
     seleccion_tipo_dia <- sample(tipo_dias, 1, prob = probabilidad_tipo_dia)
@@ -33,39 +33,33 @@ venta_periodicos <- function(compra_del_dia, dias_a_simular) {
     else
       ganancia_del_dia <- demanda_del_dia*venta_periodico - compra_del_dia*costo_periodico + (compra_del_dia - demanda_del_dia)*reciclaje_periodico
     
-    vec_simulacion = c(compra_del_dia, seleccion_tipo_dia, demanda_del_dia, ganancia_del_dia)
-    simulacion <- rbind(simulacion, vec_simulacion)
+    row_simulacion <- data.frame(compra = compra_del_dia, TipoDia=seleccion_tipo_dia, Demanda=demanda_del_dia, Ganancia=ganancia_del_dia)
+    simulacion <- rbind(simulacion, row_simulacion)
   }
-  colnames(simulacion) <- c('Compra', 'TipoDia', 'Demanda', 'Ganancia')
-  df <- data.frame(simulacion)
-  return(df)
+  return(simulacion)
 }
 
 simular <- function(dias_a_simular){
-  promedios <- list()
-  lista_tipo_compra <- seq(from = 40, to = 100, by = 10 )  
+  out <- data.frame()
+  lista_tipo_compra <- seq(from = 40, to = 100, by = 10 ) 
+  i=1
   for (compra in lista_tipo_compra){
     
     resultado_simulacion <- venta_periodicos(compra, dias_a_simular)
     
-    promedios <- rbind(promedios,c(compra, mean(as.numeric(resultado_simulacion$Ganancia))))
-                       #, 
-                        #           sd(as.numeric(resultado_simulacion$Ganancia)), 
-                        #           median(as.numeric(resultado_simulacion$Ganancia))))
+    step_sim <- data.frame(sim= i,promedio_ganancia_diaria = mean(resultado_simulacion$Ganancia),
+                           desviacion_ganancia_diaria = sd(resultado_simulacion$Ganancia),
+                           oferta = compra)
+    out <- rbind(out,step_sim)
+    i <- i+1
   }
-  colnames(promedios) <- c('Compra', 'Promedio')#,'DS', 'Mediana')
-  df <- data.frame(promedios)
-  return(df)
+  return(out)
 }
 
-vec <- simular(20)
+result <- simular(2000)
 
-View(vec)
+View(result)
 
-debug(simular)
-debug(venta_periodicos)
-
-venta_periodicos(40,5)
 
 
 
