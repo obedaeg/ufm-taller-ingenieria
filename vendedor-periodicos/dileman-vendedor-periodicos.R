@@ -1,4 +1,6 @@
 library(ggplot2)
+library(dplyr)
+
 venta_periodicos <- function(compra_del_dia, dias_a_simular) {
 
   costo_periodico <- 0.30
@@ -27,7 +29,7 @@ venta_periodicos <- function(compra_del_dia, dias_a_simular) {
       demanda_del_dia <- sample(lista_tipo_demanda, 1, prob = probabilidad_venta_excelente)  
     
     if (demanda_del_dia >= compra_del_dia)
-       ganancia_del_dia <- compra_del_dia*venta_periodico - compra_del_dia*costo_periodico - (demanda_del_dia - compra_del_dia)*venta_periodico
+       ganancia_del_dia <- compra_del_dia*venta_periodico - compra_del_dia*costo_periodico - (demanda_del_dia - compra_del_dia)*(venta_periodico-costo_periodico)
     else
       ganancia_del_dia <- demanda_del_dia*venta_periodico - compra_del_dia*costo_periodico + (compra_del_dia - demanda_del_dia)*reciclaje_periodico
     
@@ -52,16 +54,18 @@ simular <- function(dias_a_simular){
                         #           median(as.numeric(resultado_simulacion$Ganancia))))
   }
   colnames(promedios) <- c('Compra', 'Promedio')#,'DS', 'Mediana')
-  df <- data.frame(simulacion)
+  df <- data.frame(promedios)
   return(df)
 }
 
 vec <- simular(20)
 
-table <- table(vec)
+View(vec)
 
+debug(simular)
+debug(venta_periodicos)
 
-
+venta_periodicos(40,5)
 
 
 
