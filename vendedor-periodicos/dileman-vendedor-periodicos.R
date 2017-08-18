@@ -39,26 +39,36 @@ venta_periodicos <- function(compra_del_dia, dias_a_simular) {
   return(simulacion)
 }
 
-simular <- function(dias_a_simular){
+simular <- function(dias_a_simular = 20, resumen = TRUE){
   out <- data.frame()
   lista_tipo_compra <- seq(from = 40, to = 100, by = 10 ) 
-  i=1
+  
   for (compra in lista_tipo_compra){
     
     resultado_simulacion <- venta_periodicos(compra, dias_a_simular)
-    
-    step_sim <- data.frame(sim= i,promedio_ganancia_diaria = mean(resultado_simulacion$Ganancia),
-                           desviacion_ganancia_diaria = sd(resultado_simulacion$Ganancia),
-                           oferta = compra)
+    if (resumen)
+      step_sim <- data.frame(promedio_ganancia_diaria = mean(resultado_simulacion$Ganancia),
+                             desviacion_ganancia_diaria = sd(resultado_simulacion$Ganancia),
+                             oferta = compra)
+    else
+      step_sim <- data.frame(ganancia = resultado_simulacion$Ganancia,
+                             oferta = compra)
     out <- rbind(out,step_sim)
-    i <- i+1
+    
   }
   return(out)
 }
 
-result <- simular(2000)
+result <- simular(resumen = FALSE)
 
 View(result)
+
+
+plot(result$oferta,result$promedio_ganancia_diaria,type = 'l')
+
+simular(dias_a_simular = 2000, resumen = FALSE) %>% ggplot(aes(as.factor(oferta),ganancia))+
+   geom_boxplot()
+
 
 
 
